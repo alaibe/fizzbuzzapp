@@ -1,0 +1,54 @@
+#!/bin/bash
+
+name=""
+host=${1:-"http://localhost:3000"}
+
+function fizzbuzz_login {
+  echo "What is your name"
+  read name
+  curl $host/sessions -X POST -d user[name]=$name
+  echo '\n'
+}
+
+function fizzbuzz_show {
+  echo "offset? default is 1"
+  read offset
+  echo "limit? default is 100"
+  read limit
+  curl $host/?offset=$offset\&limit=$limit
+  echo '\n'
+}
+
+function fizzbuzz_favorites {
+  curl $host/favorites -H "Authorization: Token ${name}"
+  echo '\n'
+}
+
+function fizzbuzz_add_favorite {
+  echo "offset?"
+  read offset
+  curl $host/favorites -X POST -d favorite[offset]=$offset -H "Authorization: Token ${name}"
+  echo '\n'
+}
+
+while true
+do
+  echo "Type the command: login | favorites | add_favorite | show | C-c to quit"
+  read command
+  case $command in
+    "login" )
+        fizzbuzz_login
+    ;;
+    "favorites" )
+        fizzbuzz_favorites
+    ;;
+    "add_favorite" )
+        fizzbuzz_add_favorite
+    ;;
+    "show" )
+        fizzbuzz_show
+    ;;
+    * )
+        echo "Unsupported command"
+  esac
+done
